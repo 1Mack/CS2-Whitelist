@@ -1,5 +1,6 @@
 # CS2 Whitelist
 Plugin for CS2 that creates a whitelist or blacklist system.
+You can use Database or .txt file
 
 ## Installation
 1. Install **[CounterStrike Sharp](https://github.com/roflmuffin/CounterStrikeSharp/releases)** and **[Metamod:Source](https://www.sourcemm.net/downloads.php/?branch=master)**;
