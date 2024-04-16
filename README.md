@@ -29,6 +29,9 @@ The config is created automatically. ***(Path: `csgo/addons/counterstrikesharp/c
     "Remove": "wlremove", // Remove a player from the list
     "RemovePermission": "@css/root"
   },
+  "CheckIfMemberIsInGroup": false,
+  "Apikey": "", //Steam Api Key
+  "ServerID": 1 // -1 or 0 = disable. Increase this number on each server
   "ConfigVersion": 1
 }
 ```

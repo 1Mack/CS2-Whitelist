@@ -75,6 +75,6 @@ public class SteamGroup
   [JsonPropertyName("CheckIfMemberIsInGroup")]
   public bool CheckIfMemberIsInGroup { get; set; } = false;
   [JsonPropertyName("Apikey")]
-  public string Apikey { get; set; } = "@css/root";
+  public string Apikey { get; set; } = "";
 
 }
