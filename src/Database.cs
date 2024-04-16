@@ -1,10 +1,13 @@
 using Dapper;
+using Microsoft.Extensions.Logging;
 using MySqlConnector;
 
 namespace Whitelist;
 
 public partial class Whitelist
 {
+  private string _databaseConnectionString = string.Empty;
+
   private void BuildDatabaseConnectionString()
   {
     var builder = new MySqlConnectionStringBuilder
@@ -16,47 +19,29 @@ public partial class Whitelist
       Port = (uint)Config.Database.Port,
     };
 
-    DatabaseConnectionString = builder.ConnectionString;
-  }
-
-  private void TestDatabaseConnection()
-  {
-    try
-    {
-      using var connection = new MySqlConnection(DatabaseConnectionString);
-      connection.Open();
-
-      if (connection.State != System.Data.ConnectionState.Open)
-      {
-        throw new Exception($"{Localizer["Prefix"]} Unable connect to database!");
-      }
-    }
-    catch (Exception ex)
-    {
-      throw new Exception($"{Localizer["Prefix"]} Unknown mysql exception! " + ex.Message);
-    }
-    CheckDatabaseTables();
+    _databaseConnectionString = builder.ConnectionString;
   }
 
   async private void CheckDatabaseTables()
   {
     try
     {
-      using var connection = new MySqlConnection(DatabaseConnectionString);
+      using var connection = new MySqlConnection(_databaseConnectionString);
       await connection.OpenAsync();
 
 
       try
       {
         await connection.ExecuteAsync(@$"CREATE TABLE IF NOT EXISTS `{Config.Database.Prefix}` 
-        (`id` INT NOT NULL AUTO_INCREMENT, `value` varchar(128) UNIQUE, PRIMARY KEY (`id`)) 
+        (`id` INT NOT NULL AUTO_INCREMENT, `value` varchar(128) NOT NULL, `server_id` INT, PRIMARY KEY (`id`),
+         CONSTRAINT UK_WHITELIST UNIQUE (value,server_id)) 
          ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci");
 
         await connection.CloseAsync();
       }
       catch (Exception ex)
       {
-        Console.WriteLine(ex.Message);
+        Logger.LogError(ex.Message);
         await connection.CloseAsync();
         throw new Exception($"{Localizer["Prefix"]} Unable to create tables!");
       }
@@ -66,15 +51,17 @@ public partial class Whitelist
       throw new Exception($"{Localizer["Prefix"]} Unknown mysql exception! " + ex.Message);
     }
   }
-  async public Task<IEnumerable<dynamic>?> GetWhitelistFromDatabase(string[] value)
+  async public Task<IEnumerable<dynamic>?> GetFromDatabase(string[] value)
   {
     try
     {
-      using var connection = new MySqlConnection(DatabaseConnectionString);
+      using var connection = new MySqlConnection(_databaseConnectionString);
 
-      string query = $"SELECT * FROM {Config.Database.Prefix} WHERE value IN ({string.Join(",", value.Select(v => $"'{v}'"))})";
+      string query = @$"SELECT * FROM {Config.Database.Prefix}
+       WHERE value IN ({string.Join(",", value.Select(v => $"'{v}'"))}) 
+       {(Config.ServerID >= 0 ? $"AND (server_id = {Config.ServerID} OR server_id = 0)" : "")}";
 
-      IEnumerable<dynamic> result = await connection.QueryAsync(query, new { value });
+      IEnumerable<dynamic> result = await connection.QueryAsync(query);
       await connection.CloseAsync();
 
       return result;
@@ -82,29 +69,33 @@ public partial class Whitelist
     }
     catch (Exception e)
     {
-      Console.WriteLine(e);
+      Logger.LogError(e.Message);
       return null;
     }
   }
-  async public Task<bool> SetWhitelistToDatabase(string[] value, bool isInsert)
+  async public Task<bool> SetToDatabase(string[] value, bool isInsert)
   {
+    bool isServerIDEnabled = Config.ServerID >= 0;
+
     try
     {
-      using var connection = new MySqlConnection(DatabaseConnectionString);
-
-      string query = isInsert ?
-       $"INSERT INTO `{Config.Database.Prefix}` (value) VALUES {string.Join(",", value.Select(v => $"('{v}')"))}"
+      using var connection = new MySqlConnection(_databaseConnectionString);
+      string query =
+      isInsert ?
+          @$"INSERT INTO `{Config.Database.Prefix}` (value{(isServerIDEnabled ? ",server_id" : "")}) 
+          VALUES {string.Join(",", string.Join(",", value.Select(v => $"({v})")))}"
       :
-      $"DELETE FROM `{Config.Database.Prefix}` WHERE value in ({string.Join(",", value.Select(v => $"'{v}'"))})"
-      ;
+        @$"DELETE FROM `{Config.Database.Prefix}` WHERE 
+        value in ({string.Join(",", value.Select(v => $"'{v}'"))} 
+        {(isServerIDEnabled ? $" AND (server_id = {Config.ServerID} OR server_id = 0)" : "")})";
 
-      await connection.ExecuteAsync(query, new { value });
+      await connection.ExecuteAsync(query);
       await connection.CloseAsync();
       return true;
     }
     catch (Exception e)
     {
-      Console.WriteLine(e);
+      Logger.LogError(e.Message);
       return false;
     }
   }

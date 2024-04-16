@@ -6,12 +6,11 @@ namespace Whitelist;
 public partial class Whitelist : BasePlugin, IPluginConfig<Config>
 {
   public override string ModuleName => "Whitelist";
-  public override string ModuleDescription => "Only allow players ";
+  public override string ModuleDescription => "Only allow or block players from a list on database or file";
   public override string ModuleAuthor => "1MaaaaaacK";
-  public override string ModuleVersion => "1.0.0";
+  public override string ModuleVersion => "1.0.1";
   public static int ConfigVersion => 1;
-  public string DatabaseConnectionString = string.Empty;
-  public string[] WhitelistValues = Array.Empty<string>();
+  public string[] WhitelistValues = [];
 
 
   public override void Load(bool hotReload)
@@ -27,11 +26,11 @@ public partial class Whitelist : BasePlugin, IPluginConfig<Config>
     if (Config.UseDatabase)
     {
       BuildDatabaseConnectionString();
-      TestDatabaseConnection();
+      CheckDatabaseTables();
     }
     else
     {
-      CheckWhitelistFile();
+      CheckFile();
     }
   }
 }

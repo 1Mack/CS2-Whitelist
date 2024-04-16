@@ -1,3 +1,5 @@
+using System.Net.Http.Json;
+using System.Text.Json;
 using CounterStrikeSharp.API;
 
 namespace Whitelist;
@@ -8,7 +10,7 @@ public partial class Whitelist
   {
     if (Config.UseDatabase)
     {
-      IEnumerable<dynamic>? whitelisted = await GetWhitelistFromDatabase(value);
+      IEnumerable<dynamic>? whitelisted = await GetFromDatabase(value);
 
       if (whitelisted != null && whitelisted.Any())
         return true;
@@ -29,7 +31,7 @@ public partial class Whitelist
 
     });
   }
-  public void CheckWhitelistFile()
+  public void CheckFile()
   {
     string path = Path.GetFullPath(
       Path.Combine(ModulePath, $"../../../configs/plugins/{ModuleName}/whitelist.txt")
@@ -52,7 +54,7 @@ STEAM_1:1:79461554 // STEAMID
       }
       string[] lines = await File.ReadAllLinesAsync(path, System.Text.Encoding.UTF8);
 
-      WhitelistValues = lines.Where(line => !line.StartsWith("//"))
+      WhitelistValues = lines.Where(line => !line.Trim().StartsWith("//"))
       .SelectMany(line => line.Split("//")
         .Take(1)
         .Select(part => part.Trim())
@@ -60,7 +62,7 @@ STEAM_1:1:79461554 // STEAMID
       .ToArray();
     });
   }
-  public async Task<bool> SetWhitelistToFile(string[] values, bool isInsert)
+  public async Task<bool> SetToFile(string[] values, bool isInsert)
   {
 
     try
@@ -82,6 +84,45 @@ STEAM_1:1:79461554 // STEAMID
     catch (System.Exception)
     {
       return false;
+    }
+  }
+  public async Task<string[]?> GetSteamGroupsId(string steamid)
+  {
+
+    try
+    {
+
+      using var httpClient = new HttpClient();
+
+      JsonElement jsonData = await httpClient.GetFromJsonAsync<JsonElement>($"https://api.steampowered.com/ISteamUser/GetUserGroupList/v1/?key={Config.SteamGroup.Apikey}&steamid={steamid}");
+      dynamic? response = jsonData.Deserialize<dynamic>();
+
+      if (!jsonData.TryGetProperty("response", out var responseProperty) ||
+          responseProperty.ValueKind != JsonValueKind.Object)
+      {
+        Console.WriteLine("[SteamGroupRestrict] An error occurred: Response is null or not an object.");
+        return null;
+      }
+
+      if (!responseProperty.GetProperty("success").GetBoolean())
+      {
+        return null;
+      }
+      string[] groupsId = Array.Empty<string>();
+
+      foreach (var group in responseProperty.GetProperty("groups").EnumerateArray())
+      {
+        string? groupId = group.GetProperty("gid").GetString();
+
+        if (!string.IsNullOrEmpty(groupId)) _ = groupsId.Append(groupId);
+      }
+
+      return groupsId;
+    }
+    catch (Exception e)
+    {
+      Console.WriteLine($"[SteamGroupRestrict] An error occurred: {e.Message}");
+      return null;
     }
   }
 }

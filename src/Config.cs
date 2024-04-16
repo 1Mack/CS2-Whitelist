@@ -15,6 +15,10 @@ public partial class Whitelist
     {
       throw new Exception($"You need to setup Database credentials in config!");
     }
+    if (config.SteamGroup.Apikey.Length == 0 && config.SteamGroup.CheckIfMemberIsInGroup)
+    {
+      throw new Exception($"You need to setup Steam Group ApiKey in config!");
+    }
 
     Config = config;
   }
@@ -34,6 +38,10 @@ public class Config : BasePluginConfig
   public Database Database { get; set; } = new();
   [JsonPropertyName("Commands")]
   public Commands Commands { get; set; } = new();
+  [JsonPropertyName("SteamGroup")]
+  public SteamGroup SteamGroup { get; set; } = new();
+  [JsonPropertyName("ServerID")]
+  public int ServerID { get; set; } = 1;
 }
 public class Database
 {
@@ -60,5 +68,13 @@ public class Commands
   public string Remove { get; set; } = "wlremove";
   [JsonPropertyName("RemovePermission")]
   public string RemovePermission { get; set; } = "@css/root";
+
+}
+public class SteamGroup
+{
+  [JsonPropertyName("CheckIfMemberIsInGroup")]
+  public bool CheckIfMemberIsInGroup { get; set; } = false;
+  [JsonPropertyName("Apikey")]
+  public string Apikey { get; set; } = "@css/root";
 
 }

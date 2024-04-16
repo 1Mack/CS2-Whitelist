@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Whitelist")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+04b2a4f64b26a071940f4714d8a7a4d482206533")]
 [assembly: System.Reflection.AssemblyProductAttribute("Whitelist")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Whitelist")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

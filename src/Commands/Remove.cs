@@ -16,18 +16,10 @@ public partial class Whitelist
       return;
     }
     string[] commands = command.ArgString.Split(" ");
-    Task.Run(async () =>
-    {
-      bool result = Config.UseDatabase ? await SetWhitelistToDatabase(commands, false) : await SetWhitelistToFile(commands, false);
 
-      Server.NextFrame(() =>
-      {
-        if (result)
-          Server.PrintToChatAll($"{Localizer["Prefix"]} {Localizer["Success"]}");
-        else
-          Server.PrintToChatAll($"{Localizer["Prefix"]} {Localizer["Failure"]}");
-      });
-    });
+    Task<bool> task = Task.Run(() => Config.UseDatabase ? SetToDatabase(commands, false) : SetToFile(commands, false));
 
+    task.Wait();
+    command.ReplyToCommand($"{Localizer["Prefix"]} {Localizer[task.Result ? "Success" : "Failure"]}");
   }
 }

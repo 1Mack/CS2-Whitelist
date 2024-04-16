@@ -7,8 +7,6 @@ namespace Whitelist;
 
 public partial class Whitelist
 {
-
-
   private void OnClientAuthorized(int playerSlot, SteamID steamId)
   {
     CCSPlayerController? player = Utilities.GetPlayerFromSlot(playerSlot);
@@ -34,20 +32,39 @@ public partial class Whitelist
     string steamid64 = steamId.SteamId64.ToString();
     int userId = player.UserId.Value;
 
-    string[] whitelistOptions = new[] {
+    string[] whitelistOptions = [
       steamid64,
       steamId.SteamId3.ToString(),
       steamId.SteamId2.ToString().Replace("STEAM_0", "STEAM_1")
-    };
+    ];
 
-    Task.Run(async () =>
+    if (Config.SteamGroup.CheckIfMemberIsInGroup)
     {
-      bool isWhitelisted = await IsWhitelisted(ip != null ? whitelistOptions.Append(ip).ToArray() : whitelistOptions);
+      Task<string[]?> task = Task.Run(() => GetSteamGroupsId(steamid64));
 
-      if ((isWhitelisted && Config.UseAsBlacklist) || (!isWhitelisted && !Config.UseAsBlacklist))
+      task.Wait();
+
+      if (task.Result == null)
       {
-        KickPlayer(userId, name, steamid64);
+        if (Config.KickIfFailed)
+        {
+          KickPlayer(userId, name, steamid64);
+          return;
+        }
       }
-    });
+      else
+      {
+        _ = whitelistOptions.Concat(task.Result).ToArray();
+      }
+    }
+
+    Task<bool> task2 = Task.Run(() => IsWhitelisted(ip != null ? whitelistOptions.Append(ip).ToArray() : whitelistOptions));
+
+    task2.Wait();
+
+    if ((task2.Result && Config.UseAsBlacklist) || (!task2.Result && !Config.UseAsBlacklist))
+    {
+      KickPlayer(userId, name, steamid64);
+    }
   }
 }

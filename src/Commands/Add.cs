@@ -7,7 +7,7 @@ namespace Whitelist;
 
 public partial class Whitelist
 {
-  [CommandHelper(minArgs: 1, usage: "[values] [values2] [values3]...")]
+  [CommandHelper(minArgs: 1, usage: "[values&serverID] [values2] [values3&serverID]...")]
   public void Add(CCSPlayerController? player, CommandInfo command)
   {
     if (!string.IsNullOrEmpty(Config.Commands.AddPermission) && !AdminManager.PlayerHasPermissions(player, Config.Commands.AddPermission.Split(";")))
@@ -16,18 +16,32 @@ public partial class Whitelist
       return;
     }
     string[] commands = command.ArgString.Split(" ");
-    Task.Run(async () =>
+
+    if (Config.ServerID > 0)
     {
-      bool result = Config.UseDatabase ? await SetWhitelistToDatabase(commands, true) : await SetWhitelistToFile(commands, true);
-
-      Server.NextFrame(() =>
+      commands = commands.Select(v =>
       {
-        if (result)
-          Server.PrintToChatAll($"{Localizer["Prefix"]} {Localizer["Success"]}");
+        if (v.Contains('&'))
+        {
+          string[] toSplit = v.Split("&");
+          return $"\"{toSplit[0]}\",{toSplit[1]}";
+        }
         else
-          Server.PrintToChatAll($"{Localizer["Prefix"]} {Localizer["Failure"]}");
-      });
-    });
+        {
+          return $"\"{v}\",{Config.ServerID}";
+        }
 
+      }).ToArray();
+    }
+    else if (commands.Any(v => v.Split(",").Length > 1))
+    {
+      command.ReplyToCommand($"{Localizer["Prefix"]} {Localizer["Failure"]}");
+      return;
+    }
+
+    Task<bool> task = Task.Run(() => Config.UseDatabase ? SetToDatabase(commands, true) : SetToFile(commands, true));
+
+    task.Wait();
+    command.ReplyToCommand($"{Localizer["Prefix"]} {Localizer[task.Result ? "Success" : "Failure"]}");
   }
 }
