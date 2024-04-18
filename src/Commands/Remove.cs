@@ -16,6 +16,28 @@ public partial class Whitelist
     }
     string[] commands = command.ArgString.Split(" ");
 
+    if (Config.ServerID > 0 && Config.UseDatabase == true)
+    {
+      commands = commands.Select(v =>
+      {
+        if (v.Contains('&'))
+        {
+          string[] toSplit = v.Split("&");
+          return $"\"{toSplit[0]}\",{toSplit[1]}";
+        }
+        else
+        {
+          return $"\"{v}\",{Config.ServerID}";
+        }
+
+      }).ToArray();
+    }
+    else if (commands.Any(v => v.Split(",").Length > 1))
+    {
+      command.ReplyToCommand($"{Localizer["Prefix"]} {Localizer["Failure"]}");
+      return;
+    }
+
     Task<bool> task = Task.Run(() => Config.UseDatabase ? SetToDatabase(commands, false) : SetToFile(commands, false));
 
     task.Wait();

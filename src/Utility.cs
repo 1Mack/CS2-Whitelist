@@ -1,12 +1,13 @@
 using System.Net.Http.Json;
 using System.Text.Json;
 using CounterStrikeSharp.API;
+using Microsoft.Extensions.Logging;
 
 namespace Whitelist;
 
 public partial class Whitelist
 {
-  public async Task<bool> IsWhitelisted(string[] value)
+  public async Task<bool> IsWhitelisted(List<string> value)
   {
     if (Config.UseDatabase)
     {
@@ -81,26 +82,25 @@ STEAM_1:1:79461554 // STEAMID
       return true;
 
     }
-    catch (System.Exception)
+    catch (Exception)
     {
       return false;
     }
   }
-  public async Task<string[]?> GetSteamGroupsId(string steamid)
+  public async Task<List<string>?> GetSteamGroupsId(string steamid)
   {
 
     try
     {
 
       using var httpClient = new HttpClient();
-
       JsonElement jsonData = await httpClient.GetFromJsonAsync<JsonElement>($"https://api.steampowered.com/ISteamUser/GetUserGroupList/v1/?key={Config.SteamGroup.Apikey}&steamid={steamid}");
       dynamic? response = jsonData.Deserialize<dynamic>();
 
       if (!jsonData.TryGetProperty("response", out var responseProperty) ||
           responseProperty.ValueKind != JsonValueKind.Object)
       {
-        Console.WriteLine("[SteamGroupRestrict] An error occurred: Response is null or not an object.");
+        Logger.LogError("An error occurred: Response is null or not an object.");
         return null;
       }
 
@@ -108,20 +108,23 @@ STEAM_1:1:79461554 // STEAMID
       {
         return null;
       }
-      string[] groupsId = Array.Empty<string>();
+      List<string> groupsId = [];
 
       foreach (var group in responseProperty.GetProperty("groups").EnumerateArray())
       {
+
         string? groupId = group.GetProperty("gid").GetString();
 
-        if (!string.IsNullOrEmpty(groupId)) _ = groupsId.Append(groupId);
+        if (!string.IsNullOrEmpty(groupId))
+          groupsId.Add(groupId);
       }
+
 
       return groupsId;
     }
     catch (Exception e)
     {
-      Console.WriteLine($"[SteamGroupRestrict] An error occurred: {e.Message}");
+      Logger.LogError(e.Message);
       return null;
     }
   }

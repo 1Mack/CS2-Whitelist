@@ -32,7 +32,7 @@ public partial class Whitelist
     string steamid64 = steamId.SteamId64.ToString();
     int userId = player.UserId.Value;
 
-    string[] whitelistOptions = [
+    List<string> whitelistOptions = [
       steamid64,
       steamId.SteamId3.ToString(),
       steamId.SteamId2.ToString().Replace("STEAM_0", "STEAM_1")
@@ -40,7 +40,7 @@ public partial class Whitelist
 
     if (Config.SteamGroup.CheckIfMemberIsInGroup)
     {
-      Task<string[]?> task = Task.Run(() => GetSteamGroupsId(steamid64));
+      Task<List<string>?> task = Task.Run(() => GetSteamGroupsId(steamid64));
 
       task.Wait();
 
@@ -54,11 +54,14 @@ public partial class Whitelist
       }
       else
       {
-        _ = whitelistOptions.Concat(task.Result).ToArray();
+        foreach (var item in task.Result)
+        {
+          whitelistOptions.Add(item);
+        }
       }
     }
 
-    Task<bool> task2 = Task.Run(() => IsWhitelisted(ip != null ? whitelistOptions.Append(ip).ToArray() : whitelistOptions));
+    Task<bool> task2 = Task.Run(() => IsWhitelisted(ip != null ? [.. whitelistOptions, ip] : whitelistOptions));
 
     task2.Wait();
 

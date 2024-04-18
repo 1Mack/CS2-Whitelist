@@ -16,7 +16,7 @@ public partial class Whitelist
     }
     string[] commands = command.ArgString.Split(" ");
 
-    if (Config.ServerID > 0 && Config.Database.Password.Length > 0)
+    if (Config.ServerID > 0 && Config.UseDatabase == true)
     {
       commands = commands.Select(v =>
       {
