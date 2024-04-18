@@ -8,10 +8,10 @@ namespace Whitelist;
 public partial class Whitelist : BasePlugin, IPluginConfig<Config>
 {
   public override string ModuleName => "Whitelist";
-  public override string ModuleDescription => "Only allow or block players from a list on database or file";
+  public override string ModuleDescription => "Allow or block players from a list on database or file";
   public override string ModuleAuthor => "1MaaaaaacK";
   public override string ModuleVersion => "1.0.1";
-  public static int ConfigVersion => 1;
+  public static int ConfigVersion => 2;
   public string[] WhitelistValues = [];
 
 

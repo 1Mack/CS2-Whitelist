@@ -26,6 +26,7 @@ public partial class Whitelist
 }
 public class Config : BasePluginConfig
 {
+  public override int Version { get; set; } = 2;
   [JsonPropertyName("UseDatabase")]
   public bool UseDatabase { get; set; } = true;
   [JsonPropertyName("KickIfFailed")]
