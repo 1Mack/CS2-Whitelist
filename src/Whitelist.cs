@@ -1,8 +1,10 @@
 ﻿using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Core.Attributes;
 using static CounterStrikeSharp.API.Core.Listeners;
 
 namespace Whitelist;
 
+[MinimumApiVersion(199)]
 public partial class Whitelist : BasePlugin, IPluginConfig<Config>
 {
   public override string ModuleName => "Whitelist";
