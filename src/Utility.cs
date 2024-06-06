@@ -18,7 +18,7 @@ public partial class Whitelist
     }
     else
     {
-      if (WhitelistValues.Any(wv => value.Contains(wv)))
+      if (WhitelistValues.Any(value.Contains))
         return true;
     }
     return false;

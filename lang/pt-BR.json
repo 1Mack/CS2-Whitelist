@@ -1,0 +1,8 @@
+{
+  "Prefix": "[{RED}Whitelist{DEFAULT}]",
+  "KickReason": "Você não esta na whitelist",
+  "KickMessageOnChat": "{0} ({1}) foi expulso. Ele não tem permissão para entrar.",
+  "MissingCommandPermission": "{red}Você não tem permissão para usar esse comando!",
+  "Success": "Comando executado com {green}sucesso",
+  "Failure": "Comando executado com {red}erro"
+}
