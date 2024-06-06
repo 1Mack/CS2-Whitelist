@@ -128,4 +128,56 @@ STEAM_1:1:79461554 // STEAMID
       return null;
     }
   }
+  public void CheckVersion()
+  {
+    Task.Run(async () =>
+    {
+      using HttpClient client = new();
+      try
+      {
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("Whitelist");
+        HttpResponseMessage response = await client.GetAsync("https://api.github.com/repos/1Mack/CS2-Whitelist/releases/latest");
+
+        if (response.IsSuccessStatusCode)
+        {
+          IRemoteVersion? toJson = JsonSerializer.Deserialize<IRemoteVersion>(await response.Content.ReadAsStringAsync());
+
+          if (toJson == null)
+          {
+            Logger.LogWarning("Failed to check version1");
+          }
+          else
+          {
+            int comparisonResult = string.Compare(ModuleVersion, toJson.tag_name[1..]);
+
+            if (comparisonResult < 0)
+            {
+              Logger.LogWarning("Plugin is outdated! Check https://github.com/1Mack/CS2-Whitelist/releases/latest");
+            }
+            else if (comparisonResult > 0)
+            {
+              Logger.LogInformation("Probably dev version detected");
+            }
+            else
+            {
+              Logger.LogInformation("Plugin is up to date");
+            }
+          }
+
+        }
+        else
+        {
+          Logger.LogWarning("Failed to check version2");
+        }
+      }
+      catch (HttpRequestException ex)
+      {
+        Logger.LogError(ex, "Failed to connect to the version server.");
+      }
+      catch (Exception ex)
+      {
+        Logger.LogError(ex, "An error occurred while checking version.");
+      }
+    });
+  }
 }
