@@ -128,6 +128,11 @@ STEAM_1:1:79461554 // STEAMID
       return null;
     }
   }
+
+  internal class IRemoteVersion
+  {
+    public required string tag_name { get; set; }
+  }
   public void CheckVersion()
   {
     Task.Run(async () =>
