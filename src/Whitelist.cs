@@ -30,7 +30,7 @@ public partial class Whitelist : BasePlugin, IPluginConfig<Config>
     AddCommand($"css_{Config.Commands.Add}", "Set Admin", Add);
     AddCommand($"css_{Config.Commands.Remove}", "Remove Admin", Remove);
 
-    CheckVersion()
+    CheckVersion();
 
 
     if (Config.UseDatabase)
