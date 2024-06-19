@@ -36,7 +36,7 @@ The config is created automatically. ***(Path: `csgo/addons/counterstrikesharp/c
   "CheckIfMemberIsInGroup": false,
   "Apikey": "", //Steam Api Key - Only required when CheckIfMemberIsInGroup = true
   "ServerID": 1, // -1 or 0 = disable. Increase this number on each server
-  "ConfigVersion": 1
+  "ConfigVersion": 3
 }
 ```
 

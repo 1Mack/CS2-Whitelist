@@ -28,7 +28,7 @@ public class Config : BasePluginConfig
 {
   [JsonPropertyName("Enabled")]
   public bool Enabled { get; set; } = true;
-  public override int Version { get; set; } = 2;
+  public override int Version { get; set; } = 3;
   [JsonPropertyName("UseDatabase")]
   public bool UseDatabase { get; set; } = true;
   [JsonPropertyName("KickIfFailed")]
