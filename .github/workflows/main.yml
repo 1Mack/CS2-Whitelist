@@ -1,0 +1,43 @@
+name: Build
+
+on:
+  push:
+    branches: [ "main" ]
+    paths-ignore:
+      - '**/README.md'
+      - '**/.gitignore'
+      - '**/LICENSE'
+  pull_request:
+    branches: [ "main" ]
+    paths-ignore:
+      - '**/README.md'
+      - '**/.gitignore'
+      - '**/LICENSE'
+
+env:
+  BUILD_NUMBER: ${{ github.run_number }}
+  PROJECT_PATH: "Whitelist.csproj"
+  PROJECT_NAME: "CS2-Whitelist"
+  OUTPUT_PATH: "./CS2-Whitelist"
+
+jobs:
+
+  publish:
+    if: github.event_name == 'push'
+    permissions: write-all
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 8.0.x
+    - name: Restore
+      run: dotnet restore
+    - name: Build
+      run: dotnet build ${{ env.PROJECT_PATH }} -c CS2-Whitelist -o ${{ env.OUTPUT_PATH }}
+    - name: Archive build
+      uses: actions/upload-artifact@v3
+      with:
+        name: CS2-Whitelist
+        path: CS2-Whitelist
