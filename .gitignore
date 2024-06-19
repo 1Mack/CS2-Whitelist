@@ -1,4 +1,4 @@
-bin
-obj
+bin/
+obj/
 .vscode
-Whitelist.sln
+*.sln
