@@ -11,6 +11,7 @@
     <PackageReference Include="Dapper" Version="2.1.44" />
     <PackageReference Include="MySqlConnector" Version="2.3.7" />
     <None Update="lang\**\*.*" CopyToOutputDirectory="PreserveNewest" />
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
 
   </ItemGroup>
 
