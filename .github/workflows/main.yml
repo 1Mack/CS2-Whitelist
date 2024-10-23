@@ -27,9 +27,9 @@ jobs:
     permissions: write-all
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Setup .NET
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
     - name: Restore
@@ -37,7 +37,7 @@ jobs:
     - name: Build
       run: dotnet build ${{ env.PROJECT_PATH }} -c CS2-Whitelist -o ${{ env.OUTPUT_PATH }}
     - name: Archive build
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: CS2-Whitelist
         path: CS2-Whitelist
