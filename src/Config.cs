@@ -1,9 +1,9 @@
 using CounterStrikeSharp.API.Core;
 using System.Text.Json.Serialization;
 
-namespace Whitelist;
+namespace WhiteList;
 
-public partial class Whitelist
+public partial class WhiteList
 {
   public required Config Config { get; set; }
 
@@ -19,7 +19,6 @@ public partial class Whitelist
     {
       throw new Exception($"You need to setup Steam Group ApiKey in config!");
     }
-
     Config = config;
   }
 
@@ -28,7 +27,9 @@ public class Config : BasePluginConfig
 {
   [JsonPropertyName("Enabled")]
   public bool Enabled { get; set; } = true;
-  public override int Version { get; set; } = 2;
+  public override int Version { get; set; } = 3;
+  [JsonPropertyName("UsePrivateFeature")]
+  public bool UsePrivateFeature { get; set; } = false;
   [JsonPropertyName("UseDatabase")]
   public bool UseDatabase { get; set; } = true;
   [JsonPropertyName("KickIfFailed")]

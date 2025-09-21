@@ -2,13 +2,18 @@ using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Admin;
 using CounterStrikeSharp.API.Modules.Commands;
 
-namespace Whitelist;
+namespace WhiteList;
 
-public partial class Whitelist
+public partial class WhiteList
 {
   [CommandHelper(minArgs: 1, usage: "[values&serverID] [values2] [values3&serverID]...")]
   public void Add(CCSPlayerController? player, CommandInfo command)
   {
+    if (!Config.Enabled)
+    {
+      command.ReplyToCommand($"{Localizer["Prefix"]} {Localizer["PluginDisabled"]}");
+      return;
+    }
     if (!string.IsNullOrEmpty(Config.Commands.AddPermission) && !AdminManager.PlayerHasPermissions(player, Config.Commands.AddPermission.Split(";")))
     {
       command.ReplyToCommand($"{Localizer["Prefix"]} {Localizer["MissingCommandPermission"]}");

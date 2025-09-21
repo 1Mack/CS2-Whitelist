@@ -1,7 +1,6 @@
-bin
-obj
 .vscode
-Whitelist.sln
 .idea/*
 .vs/*
 obj/*
+bin/*
+CS2-WhiteList.sln

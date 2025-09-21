@@ -3,11 +3,11 @@ using System.Text.Json;
 using CounterStrikeSharp.API;
 using Microsoft.Extensions.Logging;
 
-namespace Whitelist;
+namespace WhiteList;
 
-public partial class Whitelist
+public partial class WhiteList
 {
-  public async Task<bool> IsWhitelisted(List<string> value)
+  public async Task<bool> IsWhiteListed(List<string> value)
   {
     if (Config.UseDatabase)
     {
@@ -18,7 +18,7 @@ public partial class Whitelist
     }
     else
     {
-      if (WhitelistValues.Any(value.Contains))
+      if (WhiteListValues.Any(value.Contains))
         return true;
     }
     return false;
@@ -55,7 +55,7 @@ STEAM_1:1:79461554 // STEAMID
       }
       string[] lines = await File.ReadAllLinesAsync(path, System.Text.Encoding.UTF8);
 
-      WhitelistValues = lines.Where(line => !line.Trim().StartsWith("//"))
+      WhiteListValues = lines.Where(line => !line.Trim().StartsWith("//"))
       .SelectMany(line => line.Split("//")
         .Take(1)
         .Select(part => part.Trim())
@@ -71,13 +71,13 @@ STEAM_1:1:79461554 // STEAMID
       string path = Path.GetFullPath(Path.Combine(ModulePath, $"../../../configs/plugins/{ModuleName}/whitelist.txt"));
       IEnumerable<string> result = isInsert
       ?
-      WhitelistValues.Concat(values.Except(WhitelistValues))
+      WhiteListValues.Concat(values.Except(WhiteListValues))
       :
-      WhitelistValues.Except(values);
+      WhiteListValues.Except(values);
 
       await File.WriteAllLinesAsync(path, result);
 
-      WhitelistValues = result.ToArray();
+      WhiteListValues = result.ToArray();
 
       return true;
 
@@ -140,8 +140,8 @@ STEAM_1:1:79461554 // STEAMID
       using HttpClient client = new();
       try
       {
-        client.DefaultRequestHeaders.UserAgent.ParseAdd("Whitelist");
-        HttpResponseMessage response = await client.GetAsync("https://api.github.com/repos/1Mack/CS2-Whitelist/releases/latest");
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("WhiteList");
+        HttpResponseMessage response = await client.GetAsync("https://api.github.com/repos/1Mack/CS2-WhiteList/releases/latest");
 
         if (response.IsSuccessStatusCode)
         {
@@ -157,7 +157,7 @@ STEAM_1:1:79461554 // STEAMID
 
             if (comparisonResult < 0)
             {
-              Logger.LogWarning("Plugin is outdated! Check https://github.com/1Mack/CS2-Whitelist/releases/latest");
+              Logger.LogWarning("Plugin is outdated! Check https://github.com/1Mack/CS2-WhiteList/releases/latest");
             }
             else if (comparisonResult > 0)
             {

@@ -2,9 +2,9 @@ using Dapper;
 using Microsoft.Extensions.Logging;
 using MySqlConnector;
 
-namespace Whitelist;
+namespace WhiteList;
 
-public partial class Whitelist
+public partial class WhiteList
 {
   private string _databaseConnectionString = string.Empty;
 

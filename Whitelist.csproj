@@ -4,13 +4,21 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <PublishDir>./bin/WhiteList/</PublishDir>
+
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CounterStrikeSharp.API" Version="1.0.211" />
-    <PackageReference Include="Dapper" Version="2.1.37" />
-    <PackageReference Include="MySqlConnector" Version="2.3.5" />
-    <None Update="lang\**\*.*" CopyToOutputDirectory="PreserveNewest" />
+    <PackageReference Include="CounterStrikeSharp.API" Version="*">
+      <PrivateAssets>none</PrivateAssets>
+      <ExcludeAssets>runtime</ExcludeAssets>
+      <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Dapper" Version="*" />
+    <PackageReference Include="MySqlConnector" Version="*" />
+    <None Update="src\lang\**\*.*" CopyToOutputDirectory="PreserveNewest">
+      <Link>lang\%(Filename)%(Extension)</Link>
+    </None>
 
   </ItemGroup>
 

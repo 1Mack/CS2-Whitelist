@@ -1,0 +1,53 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    permissions:
+        contents: write
+    name: Build and Release
+    runs-on: ubuntu-latest
+    outputs:
+        WHITELIST_VERSION: ${{ steps.WHITELIST_VERSION.outputs.WHITELIST_VERSION }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0'
+
+      - name: Get WhiteList Version
+        id: WHITELIST_VERSION
+        run: |
+            WHITELIST_VERSION=$(grep -oP 'ModuleVersion\s*=>\s*"\K[^"]*' src/WhiteList.cs)
+            echo "WHITELIST_VERSION=$WHITELIST_VERSION" >> $GITHUB_ENV
+      - name: Build and Release Artifacts
+        run: |
+          echo "Creating WhiteList base package with version: $WHITELIST_VERSION"
+          dotnet publish -o package/addons/counterstrikesharp/plugins/WhiteList
+          
+          cd package && zip -q -r ../WhiteList-$WHITELIST_VERSION.zip * && cd ..
+    
+          rm -r package/*
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          name: V${{ env.WHITELIST_VERSION }}
+          tag_name: ${{ env.WHITELIST_VERSION }}
+          body: 
+            New Version - ${{ env.WHITELIST_VERSION }}
+          draft: false
+          prerelease: false
+          files: |
+            WhiteList-${{ env.WHITELIST_VERSION }}.zip

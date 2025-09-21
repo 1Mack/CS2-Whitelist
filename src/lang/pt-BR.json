@@ -1,5 +1,5 @@
 {
-  "Prefix": "[{RED}Whitelist{DEFAULT}]",
+  "Prefix": "[{RED}WhiteList{DEFAULT}]",
   "KickReason": "Você não esta na whitelist",
   "KickMessageOnChat": "{0} ({1}) foi expulso. Ele não tem permissão para entrar.",
   "MissingCommandPermission": "{red}Você não tem permissão para usar esse comando!",
